@@ -1,6 +1,7 @@
 const productsContainer = document.querySelector(".products-container");
 const cartIcon = document.querySelector('.fa-cart-shopping.cart');
 const indicator = document.querySelector('.indicator');
+const sorryMessage = document.querySelector('.sorry-message')
 const cart = document.getElementById("cart");
 const blur = document.querySelector('.blur')
 const body = document.querySelector('body')
@@ -153,6 +154,15 @@ function generateCartProducts(carProducts) {
       blur.classList.remove('hidden')
       body.style.overflow = 'hidden'
       generateModal(product)
+
+      const id = +e.target.closest('.product').id;
+      let ele = null;
+      Array.from(productsContainer.querySelectorAll('.product')).forEach(item => {
+        if(+item.id === id) ele = item
+      })
+
+      addToCartBtnToUpdateWhenUpdateFromModal = ele.querySelector('.add_to_cart')
+      removeFromCartToUpdateWhenUpdateFromModal = ele.querySelector('.remove_from_cart')
     });
 
     quickViewBtn.appendChild(quickViewIcon1);
@@ -186,6 +196,8 @@ function generateCartProducts(carProducts) {
 
       let inde = Number(indicator.textContent);
       indicator.textContent = --inde
+
+      if(+indicator.textContent === 0) sorryMessage.classList.remove('hidden')
     })
 
     const removeIcon = document.createElement("i");
@@ -262,5 +274,7 @@ const addProductToCart = (e) => {
 
   const cartProductsList = cartProducts(JSON.parse(localStorage.getItem('productsList')))
   indicator.textContent = cartProductsList.length
+  
+  if(+indicator.textContent > 0) sorryMessage.classList.add('hidden')
   generateCartProducts(cartProductsList);
 }
