@@ -1,32 +1,13 @@
 const productsContainer = document.querySelector(".products-container");
-const cartIcon = document.querySelector('.fa-cart-shopping.cart');
+const cartIcon = document.querySelector('.fa-cart-shopping.cart-navbar');
 const indicator = document.querySelector('.indicator');
 const sorryMessage = document.querySelector('.sorry-message')
-const cart = document.getElementById("cart");
-const blur = document.querySelector('.blur')
+const cart = document.querySelector(".cart");
 const body = document.querySelector('body')
-const closeModalBtn = document.querySelector('.btn.close-modal')
 
 cartIcon.addEventListener('click', (e) => {
   cart.classList.toggle('hidden')
 })
-
-const closeModal = () => {
-  productImgDiv.remove();
-  productInfoDiv.remove();
-  modal.classList.add('hidden')
-  blur.classList.add('hidden')
-  body.style.overflow = 'auto'
-}
-
-closeModalBtn.addEventListener('click', closeModal)
-blur.addEventListener('click', closeModal)
-
-let addToCartBtn = null;
-let removeFromCart = null;
-
-let addToCartBtnToUpdateWhenUpdateFromModal = null;
-let removeFromCartToUpdateWhenUpdateFromModal = null;
 
 // function call to generate product cards
 function generateProductCards(products) {
@@ -72,11 +53,11 @@ function generateProductCards(products) {
     removeFromCart.textContent = 'Remove from Cart';
 
     if(product.added_to_cart) {
-      addToCartBtn.style.display = 'none'
-      removeFromCart.style.display = 'inline-block'
+      addToCartBtn.classList.add('hidden')
+      removeFromCart.classList.remove('hidden')
     } else {
-      addToCartBtn.style.display = 'inline-block'
-      removeFromCart.style.display = 'none'
+      addToCartBtn.classList.remove('hidden')
+      removeFromCart.classList.add('hidden')
     }
 
     // Add To Cart
@@ -101,10 +82,9 @@ function generateProductCards(products) {
     quickViewBtn.addEventListener("click", e => {
       modal.classList.remove('hidden')
       blur.classList.remove('hidden')
-      body.style.overflow = 'hidden'
       generateModal(product)
-      removeFromCartToUpdateWhenUpdateFromModal = quickViewBtn.previousElementSibling
-      addToCartBtnToUpdateWhenUpdateFromModal = removeFromCartToUpdateWhenUpdateFromModal.previousElementSibling
+      removeFromCartToUpdateWhenUpdateFromModal = quickViewBtn.closest('.product').querySelector('.remove_from_cart')      
+      addToCartBtnToUpdateWhenUpdateFromModal = quickViewBtn.closest('.product').querySelector('.add_to_cart')
     });
 
     quickViewBtn.appendChild(quickViewIcon1);
@@ -152,7 +132,6 @@ function generateCartProducts(carProducts) {
     quickViewBtn.addEventListener("click", e => {
       modal.classList.remove('hidden')
       blur.classList.remove('hidden')
-      body.style.overflow = 'hidden'
       generateModal(product)
 
       const id = +e.target.closest('.product').id;
@@ -191,8 +170,8 @@ function generateCartProducts(carProducts) {
       })
       localStorage.setItem('productsList', JSON.stringify(newList))
 
-      addToCartBtn.style.display = 'inline-block'
-      removeFromCart.style.display = 'none'
+      addToCartBtn.classList.remove('hidden')
+      removeFromCart.classList.add('hidden')
 
       let inde = Number(indicator.textContent);
       indicator.textContent = --inde
@@ -228,10 +207,11 @@ indicator.textContent = cartProductsList.length
 generateCartProducts(cartProductsList);
 
 const removeProductFromCart = (e) => {
-  const id = +e.target.closest('.product').id;
+  const pContainer = e.target.closest('.product');
+  const id = +pContainer.id
 
   removeFromCart = e.target;
-  addToCartBtn = e.target.previousElementSibling;
+  addToCartBtn = pContainer.querySelector('.add_to_cart');
 
   const newList = products.filter(prod => {
     if(prod.id === id) prod.added_to_cart = false;
@@ -240,8 +220,8 @@ const removeProductFromCart = (e) => {
   })
 
   localStorage.setItem('productsList', JSON.stringify(newList))
-  addToCartBtn.style.display = 'inline-block'
-  removeFromCart.style.display = 'none'
+  addToCartBtn.classList.remove('hidden')
+  removeFromCart.classList.add('hidden')
   
   cart.querySelectorAll('.product').forEach((prod) => {
     prod.remove();
@@ -253,10 +233,11 @@ const removeProductFromCart = (e) => {
 }
 
 const addProductToCart = (e) => {
-  const id = +e.target.closest('.product').id;
+  const pContainer = e.target.closest('.product');
+  const id = +pContainer.id
 
   addToCartBtn = e.target;
-  removeFromCart = e.target.nextElementSibling;
+  removeFromCart = pContainer.querySelector('.remove_from_cart')
 
   const newList = products.filter(prod => {
     if(prod.id === id) prod.added_to_cart = true;
@@ -265,8 +246,8 @@ const addProductToCart = (e) => {
   })
 
   localStorage.setItem('productsList', JSON.stringify(newList))
-  addToCartBtn.style.display = 'none'
-  removeFromCart.style.display = 'inline-block'
+  addToCartBtn.classList.add('hidden')
+  removeFromCart.classList.remove('hidden')
 
   cart.querySelectorAll('.product').forEach((prod) => {
     prod.remove();
